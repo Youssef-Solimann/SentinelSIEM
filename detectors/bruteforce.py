@@ -1,6 +1,8 @@
+"""Detects a burst of failed SSH logins from the same IP within a short time window."""
 from datetime import timedelta
 from .base import BaseDetector
 from models.finding import Finding
+from models.severity import Severity
 
 FAILURE_THRESHOLD = 5
 TIME_WINDOW = timedelta(minutes=5)
@@ -27,7 +29,7 @@ class BruteForceDetector(BaseDetector):
                 if count >= FAILURE_THRESHOLD:
                     findings.append(Finding(
                         title="SSH Brute Force Detected",
-                        severity="high",
+                        severity=Severity.HIGH,
                         event_type="ssh_failed_login",
                         source_ip=ip,
                         timestamp=window_start,

@@ -1,7 +1,7 @@
+"""Defines Finding, the standardized output produced by every detector."""
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
-from parsers.base import LogEvent
 
 
 @dataclass

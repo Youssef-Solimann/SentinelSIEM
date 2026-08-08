@@ -1,6 +1,8 @@
+"""Detects a successful SSH login that follows a burst of failed logins from the same IP."""
 from datetime import timedelta
 from .base import BaseDetector
 from models.finding import Finding
+from models.severity import Severity
 
 FAILURE_THRESHOLD = 3
 TIME_WINDOW = timedelta(minutes=5)
@@ -31,7 +33,7 @@ class SuccessfulLoginAfterFailuresDetector(BaseDetector):
                     if len(valid_failures) >= FAILURE_THRESHOLD:
                         findings.append(Finding(
                             title="Successful Login After Repeated Failures",
-                            severity="critical",
+                            severity=Severity.CRITICAL,
                             event_type="ssh_accepted_login",
                             source_ip=ip,
                             timestamp=event.timestamp,

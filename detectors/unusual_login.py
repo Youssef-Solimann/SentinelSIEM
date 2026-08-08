@@ -1,5 +1,7 @@
+"""Detects successful SSH logins that occur outside normal business hours."""
 from .base import BaseDetector
 from models.finding import Finding
+from models.severity import Severity
 
 BUSINESS_HOURS_START = 8
 BUSINESS_HOURS_END = 18
@@ -16,7 +18,7 @@ class UnusualLoginTimeDetector(BaseDetector):
             if hour < BUSINESS_HOURS_START or hour >= BUSINESS_HOURS_END:
                 findings.append(Finding(
                     title="Login Outside Business Hours",
-                    severity="low",
+                    severity=Severity.LOW,
                     event_type="ssh_accepted_login",
                     source_ip=event.source_ip,
                     timestamp=event.timestamp,

@@ -1,5 +1,6 @@
+"""Parses Linux auth.log (syslog) lines for SSH and sudo activity into normalized LogEvent objects."""
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from .base import LogEvent
 
 SYSLOG_PREFIX_RE = re.compile(
@@ -29,6 +30,7 @@ class AuthLogParser:
             return None
 
         timestamp = datetime.strptime(prefix.group("time"), TIME_FORMAT)
+        timestamp = timestamp.replace(tzinfo=timezone.utc)
         timestamp = timestamp.replace(year=self.default_year)
 
         process = prefix.group("process")

@@ -1,5 +1,7 @@
+"""Detects sudo commands containing keywords associated with privilege escalation."""
 from .base import BaseDetector
 from models.finding import Finding
+from models.severity import Severity
 
 DANGEROUS_COMMAND_KEYWORDS = ["shadow", "useradd", "passwd", "chmod 777", "visudo"]
 
@@ -17,7 +19,7 @@ class PrivilegeEscalationDetector(BaseDetector):
             if matched:
                 findings.append(Finding(
                     title="Suspicious Privilege Escalation Command",
-                    severity="critical",
+                    severity=Severity.CRITICAL,
                     event_type="sudo_command",
                     source_ip=event.source_ip,
                     timestamp=event.timestamp,

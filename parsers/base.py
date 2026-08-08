@@ -1,3 +1,4 @@
+"""Defines LogEvent, the normalized representation all parsers produce."""
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional

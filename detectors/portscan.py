@@ -1,6 +1,8 @@
+"""Detects a burst of requests to many distinct paths from one IP — a signature of path/directory scanning."""
 from datetime import timedelta
 from .base import BaseDetector
 from models.finding import Finding
+from models.severity import Severity
 
 DISTINCT_PATH_THRESHOLD = 5
 TIME_WINDOW = timedelta(minutes=2)
@@ -29,7 +31,7 @@ class PortScanDetector(BaseDetector):
                 if len(distinct_paths) >= DISTINCT_PATH_THRESHOLD:
                     findings.append(Finding(
                         title="Possible Port/Path Scan Detected",
-                        severity="medium",
+                        severity=Severity.MEDIUM,
                         event_type="http_request",
                         source_ip=ip,
                         timestamp=window_start,

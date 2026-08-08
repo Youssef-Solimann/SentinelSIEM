@@ -1,3 +1,4 @@
+"""Parses Apache combined-format access log lines into normalized LogEvent objects."""
 import re
 from datetime import datetime
 from .base import LogEvent
