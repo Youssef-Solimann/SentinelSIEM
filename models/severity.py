@@ -1,8 +1,11 @@
-"""Defines the shared severity levels used across all detector findings."""
+from enum import IntEnum
 
 
-class Severity:
-    CRITICAL = "critical"
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
+class Severity(IntEnum):
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
+    CRITICAL = 4
+
+    def __str__(self):
+        return self.name.lower()
