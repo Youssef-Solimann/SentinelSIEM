@@ -1,0 +1,104 @@
+"""CLI entry point that runs the full pipeline: parse logs, detect threats, generate an HTML report."""
+import argparse
+import os
+from datetime import datetime
+
+from parsers.apache_parser import ApacheLogParser
+from parsers.nginx_parser import NginxLogParser
+from parsers.auth_parser import AuthLogParser
+from detectors.engine import DetectionEngine
+from reports.html import generate_report
+from reports.stats import build_summary
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="SentinelSIEM -- parse logs, run threat detection, and generate an HTML security report.",
+        epilog=(
+            "Example:\n"
+            "  python main.py --auth sample_logs/auth.log "
+            "--nginx sample_logs/nginx_access.log "
+            "--apache sample_logs/apache_access.log"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--apache", metavar="PATH", help="path to an Apache access log file")
+    parser.add_argument("--nginx", metavar="PATH", help="path to an Nginx access log file")
+    parser.add_argument("--auth", metavar="PATH", help="path to a Linux auth.log file")
+    parser.add_argument(
+        "--output", metavar="PATH", default="report.html",
+        help="where to write the HTML report (default: report.html)",
+    )
+
+    args = parser.parse_args()
+
+    if not (args.apache or args.nginx or args.auth):
+        parser.error("at least one of --apache, --nginx, --auth must be provided")
+
+    return args
+
+
+def parse_apache(path):
+    events = []
+    apache_parser = ApacheLogParser()
+    with open(path, "r") as f:
+        for line in f:
+            event = apache_parser.parse_line(line)
+            if event:
+                events.append(event)
+    return events
+
+
+def collect_events(args):
+    events = []
+    current_year = datetime.now().year
+
+    if args.apache:
+        if os.path.exists(args.apache):
+            events.extend(parse_apache(args.apache))
+        else:
+            print(f"Error: Apache log not found, skipping: {args.apache}")
+
+    if args.nginx:
+        if os.path.exists(args.nginx):
+            events.extend(NginxLogParser().parse_file(args.nginx))
+        else:
+            print(f"Error: Nginx log not found, skipping: {args.nginx}")
+
+    if args.auth:
+        if os.path.exists(args.auth):
+            events.extend(AuthLogParser(default_year=current_year).parse_file(args.auth))
+        else:
+            print(f"Error: auth log not found, skipping: {args.auth}")
+
+    return events
+
+
+def print_summary(summary, output_path):
+    print()
+    print(f"Total events processed: {summary['total_events']}")
+    print(f"Total findings: {summary['total_findings']}")
+    print("Findings by severity:")
+    if summary["by_severity"]:
+        for severity, count in sorted(summary["by_severity"].items(), reverse=True):
+            print(f"  {severity}: {count}")
+    else:
+        print("  (none)")
+    print(f"Report written to: {output_path}")
+
+
+def main():
+    args = parse_args()
+    events = collect_events(args)
+
+    if not events:
+        print("Warning: no events were parsed from the provided log file(s).")
+
+    findings = DetectionEngine().run(events)
+    generate_report(events, findings, args.output)
+    summary = build_summary(events, findings)
+    print_summary(summary, args.output)
+
+
+if __name__ == "__main__":
+    main()

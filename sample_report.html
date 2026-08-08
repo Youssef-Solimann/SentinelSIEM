@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SentinelSIEM Security Report</title>
+<style>
+    body {
+        margin: 0;
+        padding: 2.5rem;
+        background: #0d1117;
+        color: #c9d1d9;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+    }
+    h1 {
+        color: #f0f6fc;
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+    }
+    .subtitle {
+        color: #8b949e;
+        margin-bottom: 0.25rem;
+    }
+    .meta {
+        color: #8b949e;
+        font-size: 0.85rem;
+        margin-bottom: 2rem;
+    }
+    h2 {
+        color: #f0f6fc;
+        font-size: 1.15rem;
+        border-bottom: 1px solid #21262d;
+        padding-bottom: 0.5rem;
+        margin-top: 2.5rem;
+    }
+    .tiles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1.25rem 0;
+    }
+    .tile {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        min-width: 140px;
+    }
+    .tile .label {
+        color: #8b949e;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .tile .value {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #f0f6fc;
+        margin-top: 0.25rem;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #0d1117;
+    }
+    .chart-wrap {
+        margin: 1.25rem 0 2rem;
+    }
+    .toolbar {
+        margin: 1rem 0;
+    }
+    #finding-search {
+        width: 100%;
+        max-width: 420px;
+        padding: 0.5rem 0.75rem;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        color: #c9d1d9;
+        font-size: 0.9rem;
+    }
+    #finding-search:focus {
+        outline: none;
+        border-color: #58a6ff;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+    th, td {
+        text-align: left;
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid #21262d;
+        vertical-align: top;
+    }
+    th {
+        color: #8b949e;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.03em;
+    }
+    thead th {
+        position: sticky;
+        top: 0;
+        background: #0d1117;
+    }
+    th[data-sort-key] {
+        cursor: pointer;
+        user-select: none;
+    }
+    th[data-sort-key]:hover {
+        color: #f0f6fc;
+    }
+    th.sort-asc::after {
+        content: " \2191";
+    }
+    th.sort-desc::after {
+        content: " \2193";
+    }
+    tr.finding-row {
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+    tr.finding-row:hover {
+        background: #1c2333;
+    }
+    tr.detail-row td {
+        border-bottom: 1px solid #21262d;
+        padding: 0;
+    }
+    .hidden-row {
+        display: none;
+    }
+    .chevron {
+        display: inline-block;
+        margin-right: 0.5rem;
+        color: #8b949e;
+        transition: transform 0.15s ease;
+    }
+    tr.finding-row.expanded .chevron {
+        transform: rotate(90deg);
+    }
+    .evidence {
+        padding: 0.75rem 1rem 1rem 2.25rem;
+    }
+    .evidence pre {
+        background: #010409;
+        border: 1px solid #21262d;
+        border-radius: 6px;
+        padding: 0.6rem 0.8rem;
+        margin: 0.35rem 0;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.8rem;
+        color: #8b949e;
+        overflow-x: auto;
+        white-space: pre;
+    }
+    .ip {
+        font-family: "SFMono-Regular", Consolas, monospace;
+    }
+    .timestamp {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        color: #8b949e;
+        white-space: nowrap;
+    }
+    .empty {
+        color: #8b949e;
+        font-style: italic;
+    }
+    .rank {
+        color: #8b949e;
+        display: inline-block;
+        width: 1.5rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>SentinelSIEM Security Report</h1>
+<div class="subtitle">Automated log analysis and threat detection summary</div>
+<div class="meta">Report generated at 2026-08-08 17:39:03 UTC</div>
+
+<h2>Executive Summary</h2>
+<div class="tiles">
+    <div class="tile">
+        <div class="label">Total Events Processed</div>
+        <div class="value">20</div>
+    </div>
+    <div class="tile">
+        <div class="label">Total Findings</div>
+        <div class="value">5</div>
+    </div>
+</div>
+
+<div class="tiles">
+    
+    <div class="tile">
+        <div class="label">critical</div>
+        <div class="value"><span class="badge" style="background: #f85149;">2</span></div>
+    </div>
+    
+    <div class="tile">
+        <div class="label">high</div>
+        <div class="value"><span class="badge" style="background: #f0883e;">1</span></div>
+    </div>
+    
+    <div class="tile">
+        <div class="label">medium</div>
+        <div class="value"><span class="badge" style="background: #e3b341;">1</span></div>
+    </div>
+    
+    <div class="tile">
+        <div class="label">low</div>
+        <div class="value"><span class="badge" style="background: #58a6ff;">1</span></div>
+    </div>
+    
+</div>
+
+<div class="chart-wrap">
+    
+    <svg viewBox="0 0 300 118" width="100%" style="max-width: 340px; height: 118px;" role="img" aria-label="Findings by severity">
+        
+        <text x="0" y="14" fill="#c9d1d9" font-size="12">critical</text>
+        <rect x="70" y="0" width="200" height="18" rx="3" fill="#f85149"></rect>
+        <text x="278" y="14" fill="#c9d1d9" font-size="12">2</text>
+        
+        <text x="0" y="42" fill="#c9d1d9" font-size="12">high</text>
+        <rect x="70" y="28" width="100" height="18" rx="3" fill="#f0883e"></rect>
+        <text x="178" y="42" fill="#c9d1d9" font-size="12">1</text>
+        
+        <text x="0" y="70" fill="#c9d1d9" font-size="12">medium</text>
+        <rect x="70" y="56" width="100" height="18" rx="3" fill="#e3b341"></rect>
+        <text x="178" y="70" fill="#c9d1d9" font-size="12">1</text>
+        
+        <text x="0" y="98" fill="#c9d1d9" font-size="12">low</text>
+        <rect x="70" y="84" width="100" height="18" rx="3" fill="#58a6ff"></rect>
+        <text x="178" y="98" fill="#c9d1d9" font-size="12">1</text>
+        
+    </svg>
+    
+</div>
+
+<h2>Top Attacking IPs</h2>
+
+<table>
+    <thead>
+        <tr><th>Rank</th><th>Source IP</th><th>Finding Count</th></tr>
+    </thead>
+    <tbody>
+        
+        <tr>
+            <td class="rank">1</td>
+            <td class="ip">203.0.113.5</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td class="rank">2</td>
+            <td class="ip">198.51.100.77</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td class="rank">3</td>
+            <td class="ip">198.51.100.20</td>
+            <td>1</td>
+        </tr>
+        
+    </tbody>
+</table>
+
+
+<h2>Full Findings</h2>
+<div class="toolbar">
+    <input type="text" id="finding-search" placeholder="Filter by title, source IP, or description..." autocomplete="off">
+</div>
+
+<table id="findings-table">
+    <thead>
+        <tr>
+            <th data-sort-key="title">Title</th>
+            <th data-sort-key="severity">Severity</th>
+            <th data-sort-key="ip">Source IP</th>
+            <th data-sort-key="timestamp">Timestamp</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        <tr class="finding-row"
+            data-title="SSH Brute Force Detected"
+            data-severity="3"
+            data-ip="203.0.113.5"
+            data-timestamp="2026-07-24 09:30:01+00:00"
+            data-search="ssh brute force detected 203.0.113.5 5 failed ssh logins from 203.0.113.5 within 0:05:00">
+            <td><span class="chevron">&#9656;</span>SSH Brute Force Detected</td>
+            <td><span class="badge" style="background: #f0883e;">high</span></td>
+            <td class="ip">203.0.113.5</td>
+            <td class="timestamp">2026-07-24 09:30:01+00:00</td>
+            <td>5 failed SSH logins from 203.0.113.5 within 0:05:00</td>
+        </tr>
+        <tr class="detail-row hidden-row">
+            <td colspan="5">
+                <div class="evidence">
+                    
+                        
+                        <pre>Jul 24 09:30:01 webserver sshd[1241]: Failed password for invalid user root from 203.0.113.5 port 51513 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:15 webserver sshd[1242]: Failed password for invalid user test from 203.0.113.5 port 51514 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:30 webserver sshd[1243]: Failed password for invalid user oracle from 203.0.113.5 port 51515 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:45 webserver sshd[1244]: Failed password for invalid user guest from 203.0.113.5 port 51516 ssh2</pre>
+                        
+                        <pre>Jul 24 09:31:00 webserver sshd[1245]: Failed password for invalid user postgres from 203.0.113.5 port 51517 ssh2</pre>
+                        
+                    
+                </div>
+            </td>
+        </tr>
+        
+        <tr class="finding-row"
+            data-title="Successful Login After Repeated Failures"
+            data-severity="4"
+            data-ip="203.0.113.5"
+            data-timestamp="2026-07-24 09:33:00+00:00"
+            data-search="successful login after repeated failures 203.0.113.5 5 failed logins from 203.0.113.5 immediately followed by a successful login as &#39;root&#39;">
+            <td><span class="chevron">&#9656;</span>Successful Login After Repeated Failures</td>
+            <td><span class="badge" style="background: #f85149;">critical</span></td>
+            <td class="ip">203.0.113.5</td>
+            <td class="timestamp">2026-07-24 09:33:00+00:00</td>
+            <td>5 failed logins from 203.0.113.5 immediately followed by a successful login as &#39;root&#39;</td>
+        </tr>
+        <tr class="detail-row hidden-row">
+            <td colspan="5">
+                <div class="evidence">
+                    
+                        
+                        <pre>Jul 24 09:30:01 webserver sshd[1241]: Failed password for invalid user root from 203.0.113.5 port 51513 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:15 webserver sshd[1242]: Failed password for invalid user test from 203.0.113.5 port 51514 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:30 webserver sshd[1243]: Failed password for invalid user oracle from 203.0.113.5 port 51515 ssh2</pre>
+                        
+                        <pre>Jul 24 09:30:45 webserver sshd[1244]: Failed password for invalid user guest from 203.0.113.5 port 51516 ssh2</pre>
+                        
+                        <pre>Jul 24 09:31:00 webserver sshd[1245]: Failed password for invalid user postgres from 203.0.113.5 port 51517 ssh2</pre>
+                        
+                        <pre>Jul 24 09:33:00 webserver sshd[1246]: Accepted password for root from 203.0.113.5 port 51518 ssh2</pre>
+                        
+                    
+                </div>
+            </td>
+        </tr>
+        
+        <tr class="finding-row"
+            data-title="Possible Port/Path Scan Detected"
+            data-severity="2"
+            data-ip="198.51.100.77"
+            data-timestamp="2026-07-24 10:20:00+00:00"
+            data-search="possible port/path scan detected 198.51.100.77 5 distinct paths requested from 198.51.100.77 within 0:02:00">
+            <td><span class="chevron">&#9656;</span>Possible Port/Path Scan Detected</td>
+            <td><span class="badge" style="background: #e3b341;">medium</span></td>
+            <td class="ip">198.51.100.77</td>
+            <td class="timestamp">2026-07-24 10:20:00+00:00</td>
+            <td>5 distinct paths requested from 198.51.100.77 within 0:02:00</td>
+        </tr>
+        <tr class="detail-row hidden-row">
+            <td colspan="5">
+                <div class="evidence">
+                    
+                        
+                        <pre>198.51.100.77 - - [24/Jul/2026:10:20:00 +0000] &#34;GET /admin HTTP/1.1&#34; 404 210 &#34;-&#34; &#34;curl/7.68.0&#34;</pre>
+                        
+                        <pre>198.51.100.77 - - [24/Jul/2026:10:20:20 +0000] &#34;GET /.env HTTP/1.1&#34; 404 210 &#34;-&#34; &#34;curl/7.68.0&#34;</pre>
+                        
+                        <pre>198.51.100.77 - - [24/Jul/2026:10:20:40 +0000] &#34;GET /phpmyadmin HTTP/1.1&#34; 404 210 &#34;-&#34; &#34;curl/7.68.0&#34;</pre>
+                        
+                        <pre>198.51.100.77 - - [24/Jul/2026:10:21:00 +0000] &#34;GET /wp-login.php HTTP/1.1&#34; 404 210 &#34;-&#34; &#34;curl/7.68.0&#34;</pre>
+                        
+                        <pre>198.51.100.77 - - [24/Jul/2026:10:21:20 +0000] &#34;GET /.git/config HTTP/1.1&#34; 404 210 &#34;-&#34; &#34;curl/7.68.0&#34;</pre>
+                        
+                    
+                </div>
+            </td>
+        </tr>
+        
+        <tr class="finding-row"
+            data-title="Login Outside Business Hours"
+            data-severity="1"
+            data-ip="198.51.100.20"
+            data-timestamp="2026-07-24 03:14:00+00:00"
+            data-search="login outside business hours 198.51.100.20 successful login by &#39;svc-backup&#39; from 198.51.100.20 at 03:14, outside business hours (8:00-18:00)">
+            <td><span class="chevron">&#9656;</span>Login Outside Business Hours</td>
+            <td><span class="badge" style="background: #58a6ff;">low</span></td>
+            <td class="ip">198.51.100.20</td>
+            <td class="timestamp">2026-07-24 03:14:00+00:00</td>
+            <td>Successful login by &#39;svc-backup&#39; from 198.51.100.20 at 03:14, outside business hours (8:00-18:00)</td>
+        </tr>
+        <tr class="detail-row hidden-row">
+            <td colspan="5">
+                <div class="evidence">
+                    
+                        
+                        <pre>Jul 24 03:14:00 webserver sshd[1250]: Accepted password for svc-backup from 198.51.100.20 port 52001 ssh2</pre>
+                        
+                    
+                </div>
+            </td>
+        </tr>
+        
+        <tr class="finding-row"
+            data-title="Suspicious Privilege Escalation Command"
+            data-severity="4"
+            data-ip="—"
+            data-timestamp="2026-07-24 09:35:00+00:00"
+            data-search="suspicious privilege escalation command — &#39;youssef&#39; ran a sensitive command as &#39;root&#39;: /bin/cat /etc/shadow">
+            <td><span class="chevron">&#9656;</span>Suspicious Privilege Escalation Command</td>
+            <td><span class="badge" style="background: #f85149;">critical</span></td>
+            <td class="ip">—</td>
+            <td class="timestamp">2026-07-24 09:35:00+00:00</td>
+            <td>&#39;youssef&#39; ran a sensitive command as &#39;root&#39;: /bin/cat /etc/shadow</td>
+        </tr>
+        <tr class="detail-row hidden-row">
+            <td colspan="5">
+                <div class="evidence">
+                    
+                        
+                        <pre>Jul 24 09:35:00 webserver sudo: youssef : TTY=pts/0 ; PWD=/home/youssef ; USER=root ; COMMAND=/bin/cat /etc/shadow</pre>
+                        
+                    
+                </div>
+            </td>
+        </tr>
+        
+    </tbody>
+</table>
+
+
+<script>
+(function () {
+    var table = document.getElementById('findings-table');
+    if (!table) { return; }
+    var tbody = table.querySelector('tbody');
+    var headers = Array.prototype.slice.call(table.querySelectorAll('th[data-sort-key]'));
+    var sortState = { key: null, asc: true };
+
+    function rowGroups() {
+        var mains = Array.prototype.slice.call(tbody.querySelectorAll('tr.finding-row'));
+        return mains.map(function (row) {
+            return { main: row, detail: row.nextElementSibling };
+        });
+    }
+
+    headers.forEach(function (th) {
+        th.addEventListener('click', function () {
+            var key = th.getAttribute('data-sort-key');
+            var asc = sortState.key === key ? !sortState.asc : true;
+            sortState = { key: key, asc: asc };
+
+            headers.forEach(function (h) { h.classList.remove('sort-asc', 'sort-desc'); });
+            th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+
+            var groups = rowGroups();
+            groups.sort(function (a, b) {
+                var av = a.main.getAttribute('data-' + key) || '';
+                var bv = b.main.getAttribute('data-' + key) || '';
+                var cmp;
+                if (key === 'severity') {
+                    cmp = Number(av) - Number(bv);
+                } else {
+                    cmp = av.toLowerCase().localeCompare(bv.toLowerCase());
+                }
+                return asc ? cmp : -cmp;
+            });
+
+            groups.forEach(function (g) {
+                tbody.appendChild(g.main);
+                if (g.detail) { tbody.appendChild(g.detail); }
+            });
+        });
+    });
+
+    rowGroups().forEach(function (g) {
+        g.main.addEventListener('click', function () {
+            if (!g.detail) { return; }
+            var expanded = g.main.classList.toggle('expanded');
+            g.detail.classList.toggle('hidden-row', !expanded);
+        });
+    });
+
+    var search = document.getElementById('finding-search');
+    if (search) {
+        search.addEventListener('input', function () {
+            var q = search.value.trim().toLowerCase();
+            rowGroups().forEach(function (g) {
+                var haystack = g.main.getAttribute('data-search') || '';
+                var match = haystack.indexOf(q) !== -1;
+                g.main.classList.toggle('hidden-row', !match);
+                if (!g.detail) { return; }
+                if (!match) {
+                    g.detail.classList.add('hidden-row');
+                } else if (g.main.classList.contains('expanded')) {
+                    g.detail.classList.remove('hidden-row');
+                }
+            });
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
