@@ -72,20 +72,17 @@ Findings are labeled using a shared `Severity` enum (`models/severity.py`), so e
 - `reports/stats.py` — severity counts, top attacking IPs, most common finding types, and an aggregated `build_summary()` used by both the HTML report and the CLI.
 - `reports/html.py` — a single self-contained, dark-themed HTML report (inline CSS/JS, no external dependencies, works fully offline):
   - Executive summary tiles and an inline SVG severity bar chart
-  - Sortable findings table (click a column header, click again to reverse)
-  - Real-time search/filter across title, source IP, and description
+  - Sortable findings table (click a column header, click again to reverse), including a MITRE ATT&CK Technique column
+  - Real-time search/filter across title, source IP, description, and ATT&CK technique
   - Expandable rows revealing the raw evidence log lines behind each finding
   - Rendered with Jinja2 autoescaping on, so log-derived content (attacker-controlled paths, usernames, commands) can't inject HTML/JS into the report
-- `main.py` — CLI entry point that ties parsing, detection, and report generation into one command (see [Usage](#usage)).
+- `reports/attack.py` — a static lookup table mapping each finding title to a MITRE ATT&CK technique ID, name, and tactic. Not every finding maps to a precise technique (e.g. "Login Outside Business Hours" is a behavioral heuristic, not a listed technique) — those are tagged with the closest reasonable fit rather than forcing false precision.
+- `reports/ioc.py` — extracts indicators of compromise (source IPs) from findings, aggregating finding count, severities, associated ATT&CK techniques, and first/last-seen timestamps per IP, exportable as JSON via `--iocs`.
+- `main.py` — CLI entry point that ties parsing, detection, HTML reporting, and IOC export into one command (see [Usage](#usage)).
 
 ---
 
 ## Deferred / v2
-
-### Reporting
-
-- IOC export (JSON)
-- MITRE ATT&CK mapping
 
 ### Future Enhancements
 
@@ -150,7 +147,9 @@ SentinelSIEM/
 │
 ├── reports/
 │   ├── stats.py            # summary statistics (severity counts, top IPs, etc.)
-│   └── html.py             # self-contained HTML report generator
+│   ├── html.py             # self-contained HTML report generator
+│   ├── attack.py           # finding title -> MITRE ATT&CK technique mapping
+│   └── ioc.py               # indicator of compromise extraction + JSON export
 │
 ├── rules/                  # planned: configurable detection rules
 │
@@ -219,10 +218,10 @@ LogEvent(
 Run the CLI entry point with one or more log files. At least one of `--apache`, `--nginx`, or `--auth` is required; `--output` defaults to `report.html`.
 
 ```bash
-python main.py --auth sample_logs/auth.log --nginx sample_logs/nginx_access.log --apache sample_logs/apache_access.log --output report.html
+python main.py --auth sample_logs/auth.log --nginx sample_logs/nginx_access.log --apache sample_logs/apache_access.log --output report.html --iocs iocs.json
 ```
 
-This parses the provided logs, runs `DetectionEngine`, writes the HTML report to `--output`, and prints a console summary (total events, total findings, findings by severity, and the output path). A path that doesn't exist is reported and skipped rather than crashing the run.
+This parses the provided logs, runs `DetectionEngine`, writes the HTML report to `--output`, and prints a console summary (total events, total findings, findings by severity, and the output path). A path that doesn't exist is reported and skipped rather than crashing the run. `--iocs` is optional — if provided, it also writes a JSON file of indicators of compromise (source IPs, with finding counts, severities, associated MITRE ATT&CK techniques, and first/last-seen timestamps).
 
 ### Programmatic Usage
 
@@ -294,12 +293,9 @@ for finding in findings:
 - [x] Findings report (`reports/stats.py`)
 - [x] Statistics (`reports/stats.py`)
 - [x] Self-contained HTML report (`reports/html.py`)
+- [x] MITRE ATT&CK mapping (`reports/attack.py`)
+- [x] IOC export (JSON) (`reports/ioc.py`)
 - [x] CLI entry point tying the pipeline together (`main.py`)
-
-### Deferred / v2
-
-- [ ] IOC export (JSON)
-- [ ] MITRE ATT&CK mapping
 
 ### Phase 5 — Future Enhancements
 

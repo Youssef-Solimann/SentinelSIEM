@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from jinja2 import Template
 
 from models.severity import Severity
+from reports.attack import get_technique
 from reports.stats import build_summary
 
 SEVERITY_COLORS = {
@@ -188,6 +189,10 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
         color: #8b949e;
         white-space: nowrap;
     }
+    .attack {
+        color: #8b949e;
+        white-space: nowrap;
+    }
     .empty {
         color: #8b949e;
         font-style: italic;
@@ -264,7 +269,7 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
 
 <h2>Full Findings</h2>
 <div class="toolbar">
-    <input type="text" id="finding-search" placeholder="Filter by title, source IP, or description..." autocomplete="off">
+    <input type="text" id="finding-search" placeholder="Filter by title, source IP, description, or ATT&amp;CK technique..." autocomplete="off">
 </div>
 {% if finding_rows %}
 <table id="findings-table">
@@ -274,6 +279,7 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
             <th data-sort-key="severity">Severity</th>
             <th data-sort-key="ip">Source IP</th>
             <th data-sort-key="timestamp">Timestamp</th>
+            <th data-sort-key="attack">ATT&amp;CK Technique</th>
             <th>Description</th>
         </tr>
     </thead>
@@ -284,15 +290,17 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
             data-severity="{{ row.severity_rank }}"
             data-ip="{{ row.source_ip }}"
             data-timestamp="{{ row.timestamp }}"
+            data-attack="{{ row.attack_label }}"
             data-search="{{ row.search_blob }}">
             <td><span class="chevron">&#9656;</span>{{ row.title }}</td>
             <td><span class="badge" style="background: {{ row.color }};">{{ row.severity }}</span></td>
             <td class="ip">{{ row.source_ip }}</td>
             <td class="timestamp">{{ row.timestamp }}</td>
+            <td class="attack">{{ row.attack_label }}</td>
             <td>{{ row.description }}</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     {% if row.evidence %}
                         {% for line in row.evidence %}
@@ -422,7 +430,9 @@ def generate_report(events, findings, output_path="report.html"):
     finding_rows = []
     for finding in findings:
         source_ip = finding.source_ip if finding.source_ip is not None else "—"
-        search_blob = f"{finding.title} {source_ip} {finding.description}".lower()
+        technique = get_technique(finding)
+        attack_label = f"{technique['technique_id']} - {technique['technique_name']}" if technique else "—"
+        search_blob = f"{finding.title} {source_ip} {finding.description} {attack_label}".lower()
         finding_rows.append({
             "title": finding.title,
             "severity": finding.severity,
@@ -430,6 +440,7 @@ def generate_report(events, findings, output_path="report.html"):
             "color": SEVERITY_COLORS.get(finding.severity, "#8b949e"),
             "source_ip": source_ip,
             "timestamp": finding.timestamp,
+            "attack_label": attack_label,
             "description": finding.description,
             "search_blob": search_blob,
             "evidence": [event.raw_line for event in finding.evidence],

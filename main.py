@@ -8,6 +8,7 @@ from parsers.nginx_parser import NginxLogParser
 from parsers.auth_parser import AuthLogParser
 from detectors.engine import DetectionEngine
 from reports.html import generate_report
+from reports.ioc import export_iocs_json
 from reports.stats import build_summary
 
 
@@ -18,7 +19,8 @@ def parse_args():
             "Example:\n"
             "  python main.py --auth sample_logs/auth.log "
             "--nginx sample_logs/nginx_access.log "
-            "--apache sample_logs/apache_access.log"
+            "--apache sample_logs/apache_access.log "
+            "--iocs iocs.json"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -28,6 +30,10 @@ def parse_args():
     parser.add_argument(
         "--output", metavar="PATH", default="report.html",
         help="where to write the HTML report (default: report.html)",
+    )
+    parser.add_argument(
+        "--iocs", metavar="PATH",
+        help="optional: also export indicators of compromise (source IPs) as JSON to this path",
     )
 
     args = parser.parse_args()
@@ -74,7 +80,7 @@ def collect_events(args):
     return events
 
 
-def print_summary(summary, output_path):
+def print_summary(summary, output_path, iocs_path=None, ioc_count=None):
     print()
     print(f"Total events processed: {summary['total_events']}")
     print(f"Total findings: {summary['total_findings']}")
@@ -85,6 +91,8 @@ def print_summary(summary, output_path):
     else:
         print("  (none)")
     print(f"Report written to: {output_path}")
+    if iocs_path is not None:
+        print(f"IOCs exported: {ioc_count} -> {iocs_path}")
 
 
 def main():
@@ -96,8 +104,13 @@ def main():
 
     findings = DetectionEngine().run(events)
     generate_report(events, findings, args.output)
+
+    ioc_count = None
+    if args.iocs:
+        ioc_count = len(export_iocs_json(findings, args.iocs))
+
     summary = build_summary(events, findings)
-    print_summary(summary, args.output)
+    print_summary(summary, args.output, args.iocs, ioc_count)
 
 
 if __name__ == "__main__":

@@ -168,6 +168,10 @@
         color: #8b949e;
         white-space: nowrap;
     }
+    .attack {
+        color: #8b949e;
+        white-space: nowrap;
+    }
     .empty {
         color: #8b949e;
         font-style: italic;
@@ -183,7 +187,7 @@
 
 <h1>SentinelSIEM Security Report</h1>
 <div class="subtitle">Automated log analysis and threat detection summary</div>
-<div class="meta">Report generated at 2026-08-08 17:39:03 UTC</div>
+<div class="meta">Report generated at 2026-08-08 18:04:00 UTC</div>
 
 <h2>Executive Summary</h2>
 <div class="tiles">
@@ -277,7 +281,7 @@
 
 <h2>Full Findings</h2>
 <div class="toolbar">
-    <input type="text" id="finding-search" placeholder="Filter by title, source IP, or description..." autocomplete="off">
+    <input type="text" id="finding-search" placeholder="Filter by title, source IP, description, or ATT&amp;CK technique..." autocomplete="off">
 </div>
 
 <table id="findings-table">
@@ -287,6 +291,7 @@
             <th data-sort-key="severity">Severity</th>
             <th data-sort-key="ip">Source IP</th>
             <th data-sort-key="timestamp">Timestamp</th>
+            <th data-sort-key="attack">ATT&amp;CK Technique</th>
             <th>Description</th>
         </tr>
     </thead>
@@ -297,15 +302,17 @@
             data-severity="3"
             data-ip="203.0.113.5"
             data-timestamp="2026-07-24 09:30:01+00:00"
-            data-search="ssh brute force detected 203.0.113.5 5 failed ssh logins from 203.0.113.5 within 0:05:00">
+            data-attack="T1110 - Brute Force"
+            data-search="ssh brute force detected 203.0.113.5 5 failed ssh logins from 203.0.113.5 within 0:05:00 t1110 - brute force">
             <td><span class="chevron">&#9656;</span>SSH Brute Force Detected</td>
             <td><span class="badge" style="background: #f0883e;">high</span></td>
             <td class="ip">203.0.113.5</td>
             <td class="timestamp">2026-07-24 09:30:01+00:00</td>
+            <td class="attack">T1110 - Brute Force</td>
             <td>5 failed SSH logins from 203.0.113.5 within 0:05:00</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     
                         
@@ -329,15 +336,17 @@
             data-severity="4"
             data-ip="203.0.113.5"
             data-timestamp="2026-07-24 09:33:00+00:00"
-            data-search="successful login after repeated failures 203.0.113.5 5 failed logins from 203.0.113.5 immediately followed by a successful login as &#39;root&#39;">
+            data-attack="T1078 - Valid Accounts"
+            data-search="successful login after repeated failures 203.0.113.5 5 failed logins from 203.0.113.5 immediately followed by a successful login as &#39;root&#39; t1078 - valid accounts">
             <td><span class="chevron">&#9656;</span>Successful Login After Repeated Failures</td>
             <td><span class="badge" style="background: #f85149;">critical</span></td>
             <td class="ip">203.0.113.5</td>
             <td class="timestamp">2026-07-24 09:33:00+00:00</td>
+            <td class="attack">T1078 - Valid Accounts</td>
             <td>5 failed logins from 203.0.113.5 immediately followed by a successful login as &#39;root&#39;</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     
                         
@@ -363,15 +372,17 @@
             data-severity="2"
             data-ip="198.51.100.77"
             data-timestamp="2026-07-24 10:20:00+00:00"
-            data-search="possible port/path scan detected 198.51.100.77 5 distinct paths requested from 198.51.100.77 within 0:02:00">
+            data-attack="T1595.003 - Active Scanning: Wordlist Scanning"
+            data-search="possible port/path scan detected 198.51.100.77 5 distinct paths requested from 198.51.100.77 within 0:02:00 t1595.003 - active scanning: wordlist scanning">
             <td><span class="chevron">&#9656;</span>Possible Port/Path Scan Detected</td>
             <td><span class="badge" style="background: #e3b341;">medium</span></td>
             <td class="ip">198.51.100.77</td>
             <td class="timestamp">2026-07-24 10:20:00+00:00</td>
+            <td class="attack">T1595.003 - Active Scanning: Wordlist Scanning</td>
             <td>5 distinct paths requested from 198.51.100.77 within 0:02:00</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     
                         
@@ -395,15 +406,17 @@
             data-severity="1"
             data-ip="198.51.100.20"
             data-timestamp="2026-07-24 03:14:00+00:00"
-            data-search="login outside business hours 198.51.100.20 successful login by &#39;svc-backup&#39; from 198.51.100.20 at 03:14, outside business hours (8:00-18:00)">
+            data-attack="T1078 - Valid Accounts"
+            data-search="login outside business hours 198.51.100.20 successful login by &#39;svc-backup&#39; from 198.51.100.20 at 03:14, outside business hours (8:00-18:00) t1078 - valid accounts">
             <td><span class="chevron">&#9656;</span>Login Outside Business Hours</td>
             <td><span class="badge" style="background: #58a6ff;">low</span></td>
             <td class="ip">198.51.100.20</td>
             <td class="timestamp">2026-07-24 03:14:00+00:00</td>
+            <td class="attack">T1078 - Valid Accounts</td>
             <td>Successful login by &#39;svc-backup&#39; from 198.51.100.20 at 03:14, outside business hours (8:00-18:00)</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     
                         
@@ -419,15 +432,17 @@
             data-severity="4"
             data-ip="—"
             data-timestamp="2026-07-24 09:35:00+00:00"
-            data-search="suspicious privilege escalation command — &#39;youssef&#39; ran a sensitive command as &#39;root&#39;: /bin/cat /etc/shadow">
+            data-attack="T1548.003 - Abuse Elevation Control Mechanism: Sudo and Sudo Caching"
+            data-search="suspicious privilege escalation command — &#39;youssef&#39; ran a sensitive command as &#39;root&#39;: /bin/cat /etc/shadow t1548.003 - abuse elevation control mechanism: sudo and sudo caching">
             <td><span class="chevron">&#9656;</span>Suspicious Privilege Escalation Command</td>
             <td><span class="badge" style="background: #f85149;">critical</span></td>
             <td class="ip">—</td>
             <td class="timestamp">2026-07-24 09:35:00+00:00</td>
+            <td class="attack">T1548.003 - Abuse Elevation Control Mechanism: Sudo and Sudo Caching</td>
             <td>&#39;youssef&#39; ran a sensitive command as &#39;root&#39;: /bin/cat /etc/shadow</td>
         </tr>
         <tr class="detail-row hidden-row">
-            <td colspan="5">
+            <td colspan="6">
                 <div class="evidence">
                     
                         
