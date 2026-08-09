@@ -39,3 +39,12 @@ class ApacheLogParser:
                 "agent": d["agent"],
             },
         )
+
+    def parse_file(self, path):
+        events = []
+        with open(path, "r") as f:
+            for line in f:
+                event = self.parse_line(line)
+                if event:
+                    events.append(event)
+        return events

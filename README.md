@@ -158,7 +158,20 @@ SentinelSIEM/
 │   ├── nginx_access.log
 │   └── auth.log
 │
-├── tests/                   # pending: unit tests not yet written
+├── tests/
+│   ├── helpers.py           # LogEvent/Finding factory helpers for tests
+│   ├── test_apache_parser.py
+│   ├── test_nginx_parser.py
+│   ├── test_auth_parser.py
+│   ├── test_bruteforce.py
+│   ├── test_successful_login.py
+│   ├── test_portscan.py
+│   ├── test_unusual_login.py
+│   ├── test_privilege.py
+│   ├── test_engine.py
+│   ├── test_stats.py
+│   ├── test_attack.py
+│   └── test_ioc.py
 │
 ├── main.py                  # CLI entry point
 │
@@ -231,17 +244,8 @@ from parsers.nginx_parser import NginxLogParser
 from parsers.auth_parser import AuthLogParser
 from detectors.engine import DetectionEngine
 
-# NOTE: ApacheLogParser currently only exposes parse_line(), not parse_file()
-# (unlike NginxLogParser and AuthLogParser), so Apache logs are parsed line by line.
-apache_events = []
-with open("sample_logs/apache_access.log") as f:
-    for line in f:
-        event = ApacheLogParser().parse_line(line)
-        if event:
-            apache_events.append(event)
-
+apache_events = ApacheLogParser().parse_file("sample_logs/apache_access.log")
 nginx_events = NginxLogParser().parse_file("sample_logs/nginx_access.log")
-
 auth_events = AuthLogParser(default_year=2026).parse_file("sample_logs/auth.log")
 
 events = apache_events + nginx_events + auth_events
@@ -251,6 +255,16 @@ findings = DetectionEngine().run(events)
 for finding in findings:
     print(f"[{finding.severity}] {finding.title} — {finding.description}")
 ```
+
+---
+
+## Testing
+
+```bash
+pytest
+```
+
+67 tests covering all three parsers (valid/malformed lines, timezone handling), all five detectors (empty input, exact-threshold boundaries, time-window edges, out-of-order input, evidence non-duplication), `DetectionEngine` aggregation, and the `reports/` modules (`stats.py`, `attack.py`, `ioc.py`). Tests build synthetic `LogEvent`/`Finding` objects directly (via `tests/helpers.py`) rather than depending on the sample log files, so they stay fast and isolated from parser changes.
 
 ---
 
@@ -314,6 +328,7 @@ for finding in findings:
 - `datetime`
 - HTML/CSS/vanilla JS (inline SVG charts, sortable/filterable report table)
 - Jinja2
+- pytest
 - Flask *(optional, planned for a future dashboard)*
 - YAML *(planned for configurable rules)*
 

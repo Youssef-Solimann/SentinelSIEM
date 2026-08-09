@@ -44,24 +44,13 @@ def parse_args():
     return args
 
 
-def parse_apache(path):
-    events = []
-    apache_parser = ApacheLogParser()
-    with open(path, "r") as f:
-        for line in f:
-            event = apache_parser.parse_line(line)
-            if event:
-                events.append(event)
-    return events
-
-
 def collect_events(args):
     events = []
     current_year = datetime.now().year
 
     if args.apache:
         if os.path.exists(args.apache):
-            events.extend(parse_apache(args.apache))
+            events.extend(ApacheLogParser().parse_file(args.apache))
         else:
             print(f"Error: Apache log not found, skipping: {args.apache}")
 
