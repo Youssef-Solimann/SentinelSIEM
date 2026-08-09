@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SentinelSIEM Dashboard</title>
+<style>
+    body {
+        margin: 0;
+        padding: 2.5rem;
+        background: #0d1117;
+        color: #c9d1d9;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+    }
+    h1 {
+        color: #f0f6fc;
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+    }
+    .subtitle {
+        color: #8b949e;
+        margin-bottom: 2rem;
+    }
+    form {
+        max-width: 480px;
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    label {
+        display: block;
+        margin: 1rem 0 0.35rem;
+        font-size: 0.85rem;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    input[type="file"] {
+        width: 100%;
+        color: #c9d1d9;
+        font-size: 0.9rem;
+    }
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+    }
+    .checkbox-row label {
+        margin: 0;
+        text-transform: none;
+        font-size: 0.9rem;
+        color: #c9d1d9;
+    }
+    .hint {
+        color: #8b949e;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    button {
+        margin-top: 1.5rem;
+        padding: 0.6rem 1.25rem;
+        background: #238636;
+        color: #f0f6fc;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #2ea043;
+    }
+    .error {
+        max-width: 480px;
+        background: #3d1418;
+        border: 1px solid #f85149;
+        color: #ffa198;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>SentinelSIEM Dashboard</h1>
+<div class="subtitle">Upload log files to run detection and view a live report</div>
+
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<form action="/analyze" method="post" enctype="multipart/form-data">
+    <label for="apache">Apache Access Log</label>
+    <input type="file" id="apache" name="apache">
+
+    <label for="nginx">Nginx Access Log</label>
+    <input type="file" id="nginx" name="nginx">
+
+    <label for="auth">Linux auth.log</label>
+    <input type="file" id="auth" name="auth">
+    <div class="hint">Upload at least one of the three above.</div>
+
+    <div class="checkbox-row">
+        <input type="checkbox" id="impossible_travel" name="impossible_travel">
+        <label for="impossible_travel">Run impossible-travel detection (makes external geo-IP lookups to ip-api.com)</label>
+    </div>
+
+    <button type="submit">Analyze</button>
+</form>
+
+</body>
+</html>
