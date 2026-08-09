@@ -205,13 +205,13 @@
 
 <h1>SentinelSIEM Security Report</h1>
 <div class="subtitle">Automated log analysis and threat detection summary</div>
-<div class="meta">Report generated at 2026-08-09 04:45:36 UTC</div>
+<div class="meta">Report generated at 2026-08-09 05:35:41 UTC</div>
 
 <h2>Executive Summary</h2>
 <div class="tiles">
     <div class="tile">
         <div class="label">Total Events Processed</div>
-        <div class="value">21</div>
+        <div class="value">22</div>
     </div>
     <div class="tile">
         <div class="label">Total Findings</div>
@@ -486,15 +486,15 @@
             data-title="Impossible Travel Detected"
             data-severity="4"
             data-ip="1.1.1.1"
-            data-timestamp="2026-07-24 10:33:00+00:00"
+            data-timestamp="2026-07-24 11:05:00+00:00"
             data-attack="T1078 - Valid Accounts"
-            data-search="impossible travel detected 1.1.1.1 &#39;root&#39; logged in from new york, united states (203.0.113.5) then from south brisbane, australia (1.1.1.1), 15502 km apart, 1.00 hours apart (~15502 km/h implied) t1078 - valid accounts">
+            data-search="impossible travel detected 1.1.1.1 &#39;jsmith&#39; logged in from ashburn, united states (8.8.8.8) then from south brisbane, australia (1.1.1.1), 15210 km apart, 0.08 hours apart (~182516 km/h implied) t1078 - valid accounts">
             <td><span class="chevron">&#9656;</span>Impossible Travel Detected</td>
             <td><span class="badge" style="background: #f85149;">critical</span></td>
             <td class="ip">1.1.1.1</td>
-            <td class="timestamp">2026-07-24 10:33:00+00:00</td>
+            <td class="timestamp">2026-07-24 11:05:00+00:00</td>
             <td class="attack">T1078 - Valid Accounts</td>
-            <td>&#39;root&#39; logged in from New York, United States (203.0.113.5) then from South Brisbane, Australia (1.1.1.1), 15502 km apart, 1.00 hours apart (~15502 km/h implied)</td>
+            <td>&#39;jsmith&#39; logged in from Ashburn, United States (8.8.8.8) then from South Brisbane, Australia (1.1.1.1), 15210 km apart, 0.08 hours apart (~182516 km/h implied)</td>
         </tr>
         <tr class="detail-row hidden-row">
             <td colspan="6">
@@ -504,21 +504,21 @@
                         
                         <div class="geo-point">
                             <span class="geo-label">Previous login:</span>
-                            <span>New York, United States (203.0.113.5) — 2026-07-24 09:33:00+00:00</span>
+                            <span>Ashburn, United States (8.8.8.8) — 2026-07-24 11:00:00+00:00</span>
                         </div>
                         
                         <div class="geo-point">
                             <span class="geo-label">Current login:</span>
-                            <span>South Brisbane, Australia (1.1.1.1) — 2026-07-24 10:33:00+00:00</span>
+                            <span>South Brisbane, Australia (1.1.1.1) — 2026-07-24 11:05:00+00:00</span>
                         </div>
                         
                     </div>
                     
                     
                         
-                        <pre>Jul 24 09:33:00 webserver sshd[1246]: Accepted password for root from 203.0.113.5 port 51518 ssh2</pre>
+                        <pre>Jul 24 11:00:00 webserver sshd[1260]: Accepted password for jsmith from 8.8.8.8 port 51600 ssh2</pre>
                         
-                        <pre>Jul 24 10:33:00 webserver sshd[1251]: Accepted password for root from 1.1.1.1 port 51519 ssh2</pre>
+                        <pre>Jul 24 11:05:00 webserver sshd[1261]: Accepted password for jsmith from 1.1.1.1 port 51601 ssh2</pre>
                         
                     
                 </div>

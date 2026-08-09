@@ -1,0 +1,69 @@
+[
+  {
+    "indicator": "203.0.113.5",
+    "type": "ip",
+    "finding_count": 2,
+    "finding_titles": [
+      "SSH Brute Force Detected",
+      "Successful Login After Repeated Failures"
+    ],
+    "severities": [
+      "critical",
+      "high"
+    ],
+    "attack_techniques": [
+      "T1078 - Valid Accounts",
+      "T1110 - Brute Force"
+    ],
+    "first_seen": "2026-07-24T09:30:01+00:00",
+    "last_seen": "2026-07-24T09:33:00+00:00"
+  },
+  {
+    "indicator": "198.51.100.77",
+    "type": "ip",
+    "finding_count": 1,
+    "finding_titles": [
+      "Possible Port/Path Scan Detected"
+    ],
+    "severities": [
+      "medium"
+    ],
+    "attack_techniques": [
+      "T1595.003 - Active Scanning: Wordlist Scanning"
+    ],
+    "first_seen": "2026-07-24T10:20:00+00:00",
+    "last_seen": "2026-07-24T10:20:00+00:00"
+  },
+  {
+    "indicator": "198.51.100.20",
+    "type": "ip",
+    "finding_count": 1,
+    "finding_titles": [
+      "Login Outside Business Hours"
+    ],
+    "severities": [
+      "low"
+    ],
+    "attack_techniques": [
+      "T1078 - Valid Accounts"
+    ],
+    "first_seen": "2026-07-24T03:14:00+00:00",
+    "last_seen": "2026-07-24T03:14:00+00:00"
+  },
+  {
+    "indicator": "1.1.1.1",
+    "type": "ip",
+    "finding_count": 1,
+    "finding_titles": [
+      "Impossible Travel Detected"
+    ],
+    "severities": [
+      "critical"
+    ],
+    "attack_techniques": [
+      "T1078 - Valid Accounts"
+    ],
+    "first_seen": "2026-07-24T11:05:00+00:00",
+    "last_seen": "2026-07-24T11:05:00+00:00"
+  }
+]

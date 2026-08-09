@@ -7,6 +7,7 @@ Jul 24 09:30:30 webserver sshd[1243]: Failed password for invalid user oracle fr
 Jul 24 09:30:45 webserver sshd[1244]: Failed password for invalid user guest from 203.0.113.5 port 51516 ssh2
 Jul 24 09:31:00 webserver sshd[1245]: Failed password for invalid user postgres from 203.0.113.5 port 51517 ssh2
 Jul 24 09:33:00 webserver sshd[1246]: Accepted password for root from 203.0.113.5 port 51518 ssh2
-Jul 24 10:33:00 webserver sshd[1251]: Accepted password for root from 1.1.1.1 port 51519 ssh2
+Jul 24 11:00:00 webserver sshd[1260]: Accepted password for jsmith from 8.8.8.8 port 51600 ssh2
+Jul 24 11:05:00 webserver sshd[1261]: Accepted password for jsmith from 1.1.1.1 port 51601 ssh2
 Jul 24 03:14:00 webserver sshd[1250]: Accepted password for svc-backup from 198.51.100.20 port 52001 ssh2
 Jul 24 09:35:00 webserver sudo: youssef : TTY=pts/0 ; PWD=/home/youssef ; USER=root ; COMMAND=/bin/cat /etc/shadow
