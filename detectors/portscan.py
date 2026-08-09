@@ -3,9 +3,11 @@ from datetime import timedelta
 from .base import BaseDetector
 from models.finding import Finding
 from models.severity import Severity
+from rules.loader import get_section
 
-DISTINCT_PATH_THRESHOLD = 5
-TIME_WINDOW = timedelta(minutes=2)
+_RULES = get_section("portscan")
+DISTINCT_PATH_THRESHOLD = _RULES.get("distinct_path_threshold", 5)
+TIME_WINDOW = timedelta(minutes=_RULES.get("time_window_minutes", 2))
 
 
 class PortScanDetector(BaseDetector):

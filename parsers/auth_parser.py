@@ -17,7 +17,7 @@ SUDO_RE = re.compile(
     r'(?P<user>\S+) : .*USER=(?P<target_user>\S+) ; COMMAND=(?P<command>.+)'
 )
 
-TIME_FORMAT = "%b %d %H:%M:%S"
+TIME_FORMAT = "%b %d %H:%M:%S %Y"
 
 
 class AuthLogParser:
@@ -29,9 +29,8 @@ class AuthLogParser:
         if not prefix:
             return None
 
-        timestamp = datetime.strptime(prefix.group("time"), TIME_FORMAT)
+        timestamp = datetime.strptime(f"{prefix.group('time')} {self.default_year}", TIME_FORMAT)
         timestamp = timestamp.replace(tzinfo=timezone.utc)
-        timestamp = timestamp.replace(year=self.default_year)
 
         process = prefix.group("process")
         message = prefix.group("message")

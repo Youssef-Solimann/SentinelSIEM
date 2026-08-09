@@ -3,9 +3,11 @@ from datetime import timedelta
 from .base import BaseDetector
 from models.finding import Finding
 from models.severity import Severity
+from rules.loader import get_section
 
-FAILURE_THRESHOLD = 3
-TIME_WINDOW = timedelta(minutes=5)
+_RULES = get_section("successful_login")
+FAILURE_THRESHOLD = _RULES.get("failure_threshold", 3)
+TIME_WINDOW = timedelta(minutes=_RULES.get("time_window_minutes", 5))
 
 
 class SuccessfulLoginAfterFailuresDetector(BaseDetector):

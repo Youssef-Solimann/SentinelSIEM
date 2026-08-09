@@ -5,9 +5,11 @@ from .base import BaseDetector
 from models.finding import Finding
 from models.severity import Severity
 from reports.geoip import lookup_ip
+from rules.loader import get_section
 
-MAX_PLAUSIBLE_SPEED_KMH = 900
-MIN_DISTANCE_KM = 100
+_RULES = get_section("impossible_travel")
+MAX_PLAUSIBLE_SPEED_KMH = _RULES.get("max_plausible_speed_kmh", 900)
+MIN_DISTANCE_KM = _RULES.get("min_distance_km", 100)
 EARTH_RADIUS_KM = 6371
 
 

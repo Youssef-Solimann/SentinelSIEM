@@ -1,0 +1,29 @@
+# Tunable detector thresholds. Values here match each detector's built-in defaults --
+# edit a value to change detector behavior without touching Python code.
+bruteforce:
+  failure_threshold: 5
+  time_window_minutes: 5
+
+successful_login:
+  failure_threshold: 3
+  time_window_minutes: 5
+
+portscan:
+  distinct_path_threshold: 5
+  time_window_minutes: 2
+
+unusual_login:
+  business_hours_start: 8
+  business_hours_end: 18
+
+privilege:
+  dangerous_keywords:
+    - shadow
+    - useradd
+    - passwd
+    - "chmod 777"
+    - visudo
+
+impossible_travel:
+  max_plausible_speed_kmh: 900
+  min_distance_km: 100

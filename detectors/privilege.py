@@ -2,8 +2,12 @@
 from .base import BaseDetector
 from models.finding import Finding
 from models.severity import Severity
+from rules.loader import get_section
 
-DANGEROUS_COMMAND_KEYWORDS = ["shadow", "useradd", "passwd", "chmod 777", "visudo"]
+_RULES = get_section("privilege")
+DANGEROUS_COMMAND_KEYWORDS = _RULES.get(
+    "dangerous_keywords", ["shadow", "useradd", "passwd", "chmod 777", "visudo"]
+)
 
 
 class PrivilegeEscalationDetector(BaseDetector):

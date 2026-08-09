@@ -94,6 +94,11 @@ Findings are labeled using a shared `Severity` enum (`models/severity.py`), so e
 - `MAX_CONTENT_LENGTH` capped at 10 MB per request; `debug=False` by default (Flask's debugger allows arbitrary code execution if ever exposed, so it isn't the shipped default). No CSRF protection — this is scoped as a local, single-user tool, not a multi-user deployment.
 - Verified against a real running server (not just Flask's test client): uploaded the actual `sample_logs/` files via `curl`, got back valid HTML with correct event/finding counts, and confirmed the `impossible_travel` checkbox triggers a real `ip-api.com` lookup end-to-end.
 
+### ✅ Configurable Rules
+
+- `rules/config.yaml` — every tunable detector threshold (brute-force/successful-login/port-scan thresholds and time windows, business hours, dangerous `sudo` keywords, impossible-travel speed/distance) lives here as plain YAML, editable without touching Python.
+- `rules/loader.py` — `get_section(name)` reads the file and returns a dict, falling back to `{}` on a missing or malformed file rather than crashing. Each detector reads its section once at import time (e.g. `FAILURE_THRESHOLD = get_section("bruteforce").get("failure_threshold", 5)`), so a missing key or missing file transparently falls back to the exact value that used to be hardcoded — the shipped `config.yaml` matches today's defaults exactly, so this is a pure refactor with no behavior change verified by an unchanged end-to-end run (21 events, 6 findings, same severity breakdown, before and after).
+
 ---
 
 ## Deferred / v2
@@ -163,7 +168,9 @@ SentinelSIEM/
 │   ├── ioc.py               # indicator of compromise extraction + JSON export
 │   └── geoip.py             # free ip-api.com geolocation lookup (no API key)
 │
-├── rules/                  # planned: configurable detection rules
+├── rules/
+│   ├── config.yaml          # tunable detector thresholds
+│   └── loader.py            # reads config.yaml, falls back to {} if missing/invalid
 │
 ├── templates/
 │   └── index.html          # Flask dashboard upload form
@@ -189,7 +196,8 @@ SentinelSIEM/
 │   ├── test_ioc.py
 │   ├── test_geoip.py         # network calls mocked, no real HTTP requests
 │   ├── test_impossible_travel.py  # uses an injected fake geo_lookup
-│   └── test_webapp.py        # Flask test client, no real network calls
+│   ├── test_webapp.py        # Flask test client, no real network calls
+│   └── test_rules.py         # config loading, missing/invalid-file fallback
 │
 ├── main.py                  # CLI entry point
 ├── webapp.py                 # Flask dashboard entry point
@@ -293,7 +301,7 @@ for finding in findings:
 pytest
 ```
 
-86 tests covering all three parsers (valid/malformed lines, timezone handling), all six detectors (empty input, exact-threshold boundaries, time-window edges, out-of-order input, evidence non-duplication), `DetectionEngine` aggregation, the `reports/` modules (`stats.py`, `attack.py`, `ioc.py`, `geoip.py`), and the Flask dashboard's routes. Tests build synthetic `LogEvent`/`Finding` objects directly (via `tests/helpers.py`) rather than depending on the sample log files, so they stay fast and isolated from parser changes. `geoip.py`'s tests mock `urllib.request.urlopen`, `ImpossibleTravelDetector`'s tests inject a fake `geo_lookup`, and `webapp.py`'s tests use Flask's test client (in-process, no real server or network) — no test in the suite makes a real network call.
+92 tests covering all three parsers (valid/malformed lines, timezone handling), all six detectors (empty input, exact-threshold boundaries, time-window edges, out-of-order input, evidence non-duplication), `DetectionEngine` aggregation, the `reports/` modules (`stats.py`, `attack.py`, `ioc.py`, `geoip.py`), the Flask dashboard's routes, and `rules/loader.py` (including a check that every detector's constants actually match the shipped `config.yaml`, to catch a config-key typo silently falling back to a hardcoded default). Tests build synthetic `LogEvent`/`Finding` objects directly (via `tests/helpers.py`) rather than depending on the sample log files, so they stay fast and isolated from parser changes. `geoip.py`'s tests mock `urllib.request.urlopen`, `ImpossibleTravelDetector`'s tests inject a fake `geo_lookup`, and `webapp.py`'s tests use Flask's test client (in-process, no real server or network) — no test in the suite makes a real network call.
 
 ---
 
@@ -347,6 +355,7 @@ pytest
 - [x] Impossible travel detection (`detectors/impossible_travel.py`, opt-in via `--impossible-travel`)
 - [x] Flask dashboard (`webapp.py`)
 - [x] Interactive visualizations (sortable/searchable table + SVG chart, already in `reports/html.py`, now also served live via the dashboard)
+- [x] Configurable detection rules (`rules/config.yaml` + `rules/loader.py`)
 - [ ] Threat intelligence integration
 
 ---
@@ -360,7 +369,7 @@ pytest
 - Jinja2
 - pytest
 - Flask
-- YAML *(planned for configurable rules)*
+- PyYAML
 
 ---
 

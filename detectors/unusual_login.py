@@ -2,9 +2,11 @@
 from .base import BaseDetector
 from models.finding import Finding
 from models.severity import Severity
+from rules.loader import get_section
 
-BUSINESS_HOURS_START = 8
-BUSINESS_HOURS_END = 18
+_RULES = get_section("unusual_login")
+BUSINESS_HOURS_START = _RULES.get("business_hours_start", 8)
+BUSINESS_HOURS_END = _RULES.get("business_hours_end", 18)
 
 
 class UnusualLoginTimeDetector(BaseDetector):
