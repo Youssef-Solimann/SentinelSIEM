@@ -67,6 +67,13 @@ Findings are labeled using a shared `Severity` enum (`models/severity.py`), so e
 
 `Severity` is an `IntEnum`, so findings can be compared/sorted by severity (`Severity.HIGH > Severity.LOW`), and it prints as a lowercase name (`str(Severity.HIGH) == "high"`).
 
+### ✅ Impossible Travel Detection (optional, opt-in)
+
+- `reports/geoip.py` — geolocates a source IP via the free [ip-api.com](https://ip-api.com) JSON endpoint (no API key, stdlib `urllib` only). Two honest tradeoffs of the free tier, not hidden: it's **plain HTTP, not HTTPS** (the IPs you're investigating go out in cleartext to a third party), and it's rate-limited (~45 req/min).
+- `detectors/impossible_travel.py` — `ImpossibleTravelDetector` compares consecutive successful SSH logins for the *same user* and flags the pair if the implied travel speed (haversine distance ÷ time apart) exceeds `MAX_PLAUSIBLE_SPEED_KMH` (900 km/h, roughly commercial-jet cruising speed) and the distance is at least `MIN_DISTANCE_KM` (100 km, to avoid noise from city-level geo-IP imprecision on nearby locations). Simultaneous logins from distant locations are flagged directly rather than skipped.
+- Unlike the 5 core detectors, this one makes real network calls, so it is **not** part of `DetectionEngine`'s default detector list — it's wired into `main.py` behind `--impossible-travel` instead, the same opt-in pattern as `--iocs`. It's independently testable via an injectable `geo_lookup` function (`ImpossibleTravelDetector(geo_lookup=...)`), so the test suite stays offline and fast like everything else in `tests/`.
+- Verified against the real ip-api.com service (not just mocks): two logins for the same user from Ashburn, US and South Brisbane, Australia an hour apart correctly resolve to a ~15,210 km/h implied speed and get flagged. Against this repo's own `sample_logs/auth.log`, `--impossible-travel` currently finds nothing to flag — not because the IPs fail to geolocate (they do resolve), but because each user in the sample data only has one successful login, so there's no same-user pair to compare.
+
 ### ✅ Reporting
 
 - `reports/stats.py` — severity counts, top attacking IPs, most common finding types, and an aggregated `build_summary()` used by both the HTML report and the CLI.
@@ -87,8 +94,6 @@ Findings are labeled using a shared `Severity` enum (`models/severity.py`), so e
 ### Future Enhancements
 
 - Threat intelligence integration (AbuseIPDB / AlienVault OTX)
-- Geo-IP enrichment
-- Impossible travel detection
 - Flask dashboard
 - Interactive visualizations
 - Real-time log monitoring
@@ -138,18 +143,20 @@ SentinelSIEM/
 │
 ├── detectors/
 │   ├── base.py             # BaseDetector interface
-│   ├── engine.py           # DetectionEngine — runs all detectors
+│   ├── engine.py           # DetectionEngine — runs the 5 core (offline) detectors
 │   ├── bruteforce.py
 │   ├── successful_login.py
 │   ├── portscan.py
 │   ├── unusual_login.py
-│   └── privilege.py
+│   ├── privilege.py
+│   └── impossible_travel.py  # opt-in, requires network (see reports/geoip.py)
 │
 ├── reports/
 │   ├── stats.py            # summary statistics (severity counts, top IPs, etc.)
 │   ├── html.py             # self-contained HTML report generator
 │   ├── attack.py           # finding title -> MITRE ATT&CK technique mapping
-│   └── ioc.py               # indicator of compromise extraction + JSON export
+│   ├── ioc.py               # indicator of compromise extraction + JSON export
+│   └── geoip.py             # free ip-api.com geolocation lookup (no API key)
 │
 ├── rules/                  # planned: configurable detection rules
 │
@@ -171,7 +178,9 @@ SentinelSIEM/
 │   ├── test_engine.py
 │   ├── test_stats.py
 │   ├── test_attack.py
-│   └── test_ioc.py
+│   ├── test_ioc.py
+│   ├── test_geoip.py         # network calls mocked, no real HTTP requests
+│   └── test_impossible_travel.py  # uses an injected fake geo_lookup
 │
 ├── main.py                  # CLI entry point
 │
@@ -236,6 +245,8 @@ python main.py --auth sample_logs/auth.log --nginx sample_logs/nginx_access.log 
 
 This parses the provided logs, runs `DetectionEngine`, writes the HTML report to `--output`, and prints a console summary (total events, total findings, findings by severity, and the output path). A path that doesn't exist is reported and skipped rather than crashing the run. `--iocs` is optional — if provided, it also writes a JSON file of indicators of compromise (source IPs, with finding counts, severities, associated MITRE ATT&CK techniques, and first/last-seen timestamps).
 
+Add `--impossible-travel` to also run `ImpossibleTravelDetector`. This one requires network access — it queries ip-api.com (free, no key, plain HTTP) to geolocate source IPs — so it's opt-in rather than part of the default run.
+
 ### Programmatic Usage
 
 ```python
@@ -264,7 +275,7 @@ for finding in findings:
 pytest
 ```
 
-67 tests covering all three parsers (valid/malformed lines, timezone handling), all five detectors (empty input, exact-threshold boundaries, time-window edges, out-of-order input, evidence non-duplication), `DetectionEngine` aggregation, and the `reports/` modules (`stats.py`, `attack.py`, `ioc.py`). Tests build synthetic `LogEvent`/`Finding` objects directly (via `tests/helpers.py`) rather than depending on the sample log files, so they stay fast and isolated from parser changes.
+81 tests covering all three parsers (valid/malformed lines, timezone handling), all six detectors (empty input, exact-threshold boundaries, time-window edges, out-of-order input, evidence non-duplication), `DetectionEngine` aggregation, and the `reports/` modules (`stats.py`, `attack.py`, `ioc.py`, `geoip.py`). Tests build synthetic `LogEvent`/`Finding` objects directly (via `tests/helpers.py`) rather than depending on the sample log files, so they stay fast and isolated from parser changes. `geoip.py`'s tests mock `urllib.request.urlopen`, and `ImpossibleTravelDetector`'s tests inject a fake `geo_lookup` — no test in the suite makes a real network call.
 
 ---
 
@@ -277,6 +288,7 @@ pytest
 | Port Scan | Detects rapid requests to many different endpoints from a single IP |
 | Unusual Login Time | Flags logins occurring outside expected operating hours |
 | Privilege Escalation | Detects suspicious `sudo` activity and privilege-related events |
+| Impossible Travel *(opt-in, `--impossible-travel`)* | Flags a successful login for the same user from two geolocated IPs too far apart to reach in the time between logins |
 
 ---
 
@@ -313,9 +325,9 @@ pytest
 
 ### Phase 5 — Future Enhancements
 
+- [x] Geo-IP enrichment (`reports/geoip.py`)
+- [x] Impossible travel detection (`detectors/impossible_travel.py`, opt-in via `--impossible-travel`)
 - [ ] Threat intelligence integration
-- [ ] Geo-IP enrichment
-- [ ] Impossible travel detection
 - [ ] Flask dashboard
 - [ ] Visualizations
 

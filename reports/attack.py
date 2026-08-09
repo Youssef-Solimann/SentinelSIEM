@@ -29,6 +29,11 @@ ATTACK_MAPPING = {
         "technique_name": "Abuse Elevation Control Mechanism: Sudo and Sudo Caching",
         "tactic": "Privilege Escalation",
     },
+    "Impossible Travel Detected": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tactic": "Initial Access",
+    },
 }
 
 

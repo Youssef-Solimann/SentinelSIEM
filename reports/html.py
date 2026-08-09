@@ -169,6 +169,24 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
     .evidence {
         padding: 0.75rem 1rem 1rem 2.25rem;
     }
+    .geo-context {
+        margin: 0 0 0.75rem;
+        padding: 0.6rem 0.8rem;
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 6px;
+        font-size: 0.85rem;
+    }
+    .geo-point {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.15rem 0;
+    }
+    .geo-point .geo-label {
+        color: #8b949e;
+        min-width: 110px;
+        flex-shrink: 0;
+    }
     .evidence pre {
         background: #010409;
         border: 1px solid #21262d;
@@ -302,6 +320,16 @@ REPORT_TEMPLATE = Template("""<!DOCTYPE html>
         <tr class="detail-row hidden-row">
             <td colspan="6">
                 <div class="evidence">
+                    {% if row.geo_context %}
+                    <div class="geo-context">
+                        {% for point in row.geo_context %}
+                        <div class="geo-point">
+                            <span class="geo-label">{{ point.label }}:</span>
+                            <span>{{ point.city }}, {{ point.country }} ({{ point.ip }}) — {{ point.timestamp }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if row.evidence %}
                         {% for line in row.evidence %}
                         <pre>{{ line }}</pre>
@@ -444,6 +472,7 @@ def generate_report(events, findings, output_path="report.html"):
             "description": finding.description,
             "search_blob": search_blob,
             "evidence": [event.raw_line for event in finding.evidence],
+            "geo_context": finding.geo_context or [],
         })
 
     html = REPORT_TEMPLATE.render(

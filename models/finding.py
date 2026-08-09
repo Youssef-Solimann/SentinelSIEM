@@ -14,3 +14,4 @@ class Finding:
     timestamp: datetime
     description: str
     evidence: list = field(default_factory=list)
+    geo_context: Optional[list] = None

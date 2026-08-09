@@ -7,6 +7,7 @@ from parsers.apache_parser import ApacheLogParser
 from parsers.nginx_parser import NginxLogParser
 from parsers.auth_parser import AuthLogParser
 from detectors.engine import DetectionEngine
+from detectors.impossible_travel import ImpossibleTravelDetector
 from reports.html import generate_report
 from reports.ioc import export_iocs_json
 from reports.stats import build_summary
@@ -22,6 +23,7 @@ def parse_args():
             "--apache sample_logs/apache_access.log "
             "--iocs iocs.json"
         ),
+
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--apache", metavar="PATH", help="path to an Apache access log file")
@@ -34,6 +36,13 @@ def parse_args():
     parser.add_argument(
         "--iocs", metavar="PATH",
         help="optional: also export indicators of compromise (source IPs) as JSON to this path",
+    )
+    parser.add_argument(
+        "--impossible-travel", action="store_true",
+        help=(
+            "optional: also run ImpossibleTravelDetector. Requires network access -- "
+            "queries the free ip-api.com service (plain HTTP, no API key) to geolocate source IPs"
+        ),
     )
 
     args = parser.parse_args()
@@ -92,6 +101,10 @@ def main():
         print("Warning: no events were parsed from the provided log file(s).")
 
     findings = DetectionEngine().run(events)
+    if args.impossible_travel:
+        print("Note: --impossible-travel makes external geo-IP lookups (ip-api.com)")
+        findings += ImpossibleTravelDetector().detect(events)
+
     generate_report(events, findings, args.output)
 
     ioc_count = None
